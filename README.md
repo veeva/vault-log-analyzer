@@ -21,7 +21,7 @@ We recommend creating a local directory for Vault Log Analyzer related files. Th
 
 1. In the same folder where the jar file is, create a folder called "logs"
 2. Download the API Usage logs that you want to analyze from Vault, and place them in the "logs" folder 
-3. Download the <a href="https://veeva.github.io/vault-log-analyzer/maven/com/veeva/vault/vault-log-analyzer/22.3.0/vault-log-analyzer-22.3.0-api.xlsx" download>vault-log-analyzer-api.xlsx</a>, and place it in the folder with the jar file
+3. Download the <a href="https://veeva.github.io/vault-log-analyzer/maven/com/veeva/vault/vault-log-analyzer/22.3.0/vault-log-analyzer-22.3.0-api.xlsx" download>vault-log-analyzer-api.xlsx</a> file, and place it in the folder with the jar file
 4. Open a command line, and navigate to the folder where the jar file is. Run the command below
 
 ```
@@ -33,7 +33,7 @@ java -jar vault-log-analyzer-22.3.0.jar -logtype API -action IMPORT
 java -jar vault-log-analyzer-22.3.0.jar -logtype API -action ANALYZE
 ```
 
-6. Verify that a file named "vault-log-analyzer-api-{YYYYMMDD}-{time}.csv" was generated, then open the "vault-log-analyzer-api.xlsx" file with Excel. From the Ribbon, select **Data -> Refresh All**, and select the generate .csv file
+6. Verify that a file named "vault-log-analyzer-api-{YYYYMMDD}-{time}.csv" was generated, then open the "vault-log-analyzer-api.xlsx" file with Excel. From the Ribbon, select **Data -> Refresh All**, and select the generated .csv file
 
 <br />
 
@@ -43,7 +43,7 @@ java -jar vault-log-analyzer-22.3.0.jar -logtype API -action ANALYZE
 
 1. In the same folder where the jar file is, create a folder called "logs"
 2. Download the SDK Debug logs that you want to analyze from Vault, and place them in the "logs" folder 
-3. Download the <a href="https://veeva.github.io/vault-log-analyzer/maven/com/veeva/vault/vault-log-analyzer/22.3.0/vault-log-analyzer-22.3.0-debug.xlsx" download>vault-log-analyzer-debug.xlsx</a>, and place it in the folder with the jar file
+3. Download the <a href="https://veeva.github.io/vault-log-analyzer/maven/com/veeva/vault/vault-log-analyzer/22.3.0/vault-log-analyzer-22.3.0-debug.xlsx" download>vault-log-analyzer-debug.xlsx</a> file, and place it in the folder with the jar file
 4. Open a command line, and navigate to the folder where the jar file is. Run the command below
 
 ```
@@ -71,10 +71,16 @@ java -jar {jarFile} -logtype {logType} -action {actionName} -input {folderPath} 
 | -logtype | API  | ```-logtype API``` | Set the analyzer to process API Logs                                                                                                                        |
 | -action | IMPORT  | ```-action IMPORT``` | Used to import a batch of API logs                                                                                                                          |
 |  | ANALYZE  | ```-action ANALYZE``` | Used to analyze generated .db file of ```-action IMPORT``` command                                                                                          |
+|  | DOWNLOAD  | ```-action DOWNLOAD``` | Used to download API usage logs from a specified Vault                                                                                          |
 | -input | {logs folder}  | ```-input ./logs``` | Path to location of log files when using the ```-action IMPORT``` command. Defaults to "/logs" if no directory is given                                     |
 |  | {.db file}  | ```-input ./vault-log-analyzer.db``` | Path to location of .db file when using the ```-action ANALYZE``` command                                                                                   |
 | -output | {.db file}  | ```-output ./path/to/analyze.db``` | Path for generated .db file when using the ```-action IMPORT``` command. Defaults to "vault-log-analyzer.db" if no filename is given                        |
 |  | {.csv file}  | ```-output ./path/to/analyze.db``` | Path for generated .csv file when using the ```-action ANALYZE``` command. Defaults to "vault-log-analyzer-api-YYYYMMDD-{time}.csv" if no filename is given |
+|  | {folder}  | ```-output ./path/to/logs``` | Path to save API usage logs when using the  ```-action DOWNLOAD``` command. Defaults to "/logs" folder if no directory is given |
+| -vaultDns | {vault DNS}  | ```-vaultDns cholecap.veevavault.com``` | Vault where logs will be downloaded from when using the  ```-action DOWNLOAD``` command                       |
+| -sessionId | {session ID}  | ```-sessionId {session ID}``` | For Authenticating to a Vault when using the  ```-action DOWNLOAD``` command                        |
+| -startDate | {YYYY-MM-DD}  | ```-sessionId 2023-02-04``` | For specifying a start date when using the  ```-action DOWNLOAD``` command                        |
+| -endDate | {YYYY-MM-DD}  | ```-sessionId 2023-02-05``` | For specifying an end date when using the  ```-action DOWNLOAD``` command. Start date is required if using an end date. Defaults to the current day if no end date is provided                        |
 
 <br />
 
@@ -90,6 +96,11 @@ java -jar vault-log-analyzer-22.3.0.jar -logtype API -action IMPORT -input ./pat
 java -jar vault-log-analyzer-22.3.0.jar -logtype API -action ANALYZE -input ./path/to/analyze.db -output ./path/to/output.csv
 ```
 
+3. Download API Usage Logs
+```
+java -jar vault-log-analyzer-22.3.0.jar -logtype API -action DOWNLOAD -vaultDns cholecap.veevavault.com -sessionId {session ID} -startDate 2023-02-01 -endDate 2023-02-05
+```
+
 <br />
 
 ### Commands For SDK Debug Logs
@@ -103,8 +114,25 @@ java -jar vault-log-analyzer-22.3.0.jar -logtype API -action ANALYZE -input ./pa
 
 #### Example Commands
 
-* Import logs
+* Analyze logs
 ```
 java -jar vault-log-analyzer-22.3.0.jar -logtype DEBUG -action ANALYZE -input ./path/to/logs -output ./path/to/output.csv
 ```
 
+<br />
+
+### Commands For SDK Runtime Logs
+
+| Command | Parameter | Example | Description                                                                                                                                                 |
+| --- | --- | --- |-------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| -logtype | RUNTIME  | ```-logtype RUNTIME``` | Set the analyzer to process SDK Runtime Logs                                                                                                                        |
+| -action | DOWNLOAD  | ```-action DOWNLOAD``` | Used to download SDK Runtime logs from a specified Vault                                                                                          |
+| -vaultDns | {vault DNS}  | ```-vaultDns cholecap.veevavault.com``` | Vault where logs will be downloaded from when using the  ```-action DOWNLOAD``` command                       |
+| -sessionId | {session ID}  | ```-sessionId {session ID}``` | For Authenticating to a Vault when using the  ```-action DOWNLOAD``` command                        |
+| -startDate | {YYYY-MM-DD}  | ```-sessionId 2023-02-04``` | For specifying a start date when using the  ```-action DOWNLOAD``` command                        |
+| -endDate | {YYYY-MM-DD}  | ```-sessionId 2023-02-05``` | For specifying an end date when using the  ```-action DOWNLOAD``` command. Start date is required if using an end date. Defaults to the current day if no end date is provided                        |
+
+* Download SDK Runtime logs
+```
+java -jar vault-log-analyzer-22.3.0.jar -logtype RUNTIME -action DOWNLOAD -vaultDns cholecap.veevavault.com -sessionId {session ID} -startDate 2023-02-01 -endDate 2023-02-05
+```
