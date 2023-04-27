@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.veeva.vault.</groupId>
   <artifactId>vault-log-analyzer</artifactId>
-  <version>22.3.0</version>
+  <version>23.1.0</version>
   <build>
     <finalName>${project.artifactId}-${project.version}</finalName>
     <plugins>

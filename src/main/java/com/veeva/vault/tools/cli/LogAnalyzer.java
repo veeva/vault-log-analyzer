@@ -4,8 +4,6 @@ import com.veeva.vault.tools.api.ApiUsageLog;
 import com.veeva.vault.tools.sdk.SdkDebugLog;
 import com.veeva.vault.tools.sdk.SdkRuntimeLog;
 import com.veeva.vault.vapil.api.client.VaultClient;
-import com.veeva.vault.vapil.api.client.VaultClientBuilder;
-import com.veeva.vault.vapil.api.client.VaultClientId;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -67,8 +65,9 @@ public class LogAnalyzer {
 							else if (!outputApiLogDirectory.exists()) {
 								logger.error("Directory does not exist [" + outputApiLogDirectory.getAbsolutePath() + "]");
 							} else {
-								VaultClientId clientId = new VaultClientId("veeva", "vault","devsupport",true,"log-analyzer");
-								VaultClient vaultClient = VaultClientBuilder.newClientBuilder(VaultClient.AuthenticationType.SESSION_ID)
+								String clientId = "veeva-vault-devsupport-client-log-analyzer";
+								VaultClient vaultClient = VaultClient
+										.newClientBuilder(VaultClient.AuthenticationType.SESSION_ID)
 										.withVaultClientId(clientId)
 										.withVaultDNS(analyzerOptions.getVaultDNS())
 										.withVaultUsername(analyzerOptions.getVaultUsername())
@@ -117,9 +116,11 @@ public class LogAnalyzer {
 							else if (!outputApiLogDirectory.exists()) {
 								logger.error("Directory does not exist [" + outputApiLogDirectory.getAbsolutePath() + "]");
 							} else {
-								VaultClientId clientId = new VaultClientId("veeva", "vault","devsupport",true,"log-analyzer");
-								VaultClient vaultClient = VaultClientBuilder.newClientBuilder(VaultClient.AuthenticationType.SESSION_ID)
-										.withVaultClientId(clientId)
+								String vaultClientId = "verteobiotech-vault-quality-client-myintegration";
+								// Instantiate the VAPIL VaultClient using user name and password authentication
+								VaultClient vaultClient = VaultClient
+										.newClientBuilder(VaultClient.AuthenticationType.BASIC)
+										.withVaultClientId(vaultClientId)
 										.withVaultDNS(analyzerOptions.getVaultDNS())
 										.withVaultUsername(analyzerOptions.getVaultUsername())
 										.withVaultSessionId(analyzerOptions.getVaultSessionId())

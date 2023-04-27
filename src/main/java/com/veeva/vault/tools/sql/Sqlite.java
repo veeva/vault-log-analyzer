@@ -5,11 +5,14 @@ import com.veeva.vault.vapil.api.model.VaultModel;
 import java.io.File;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Sqlite {
 
-	private final Integer BATCH_SIZE = 500;
+	private final Integer BATCH_SIZE = 10000;
 
 	File dbFile = null;
 	Connection conn = null;
@@ -17,6 +20,8 @@ public class Sqlite {
 
 	int numStatements = 0;
 	StringBuilder sqlCachedStatements = new StringBuilder();
+	Map<String, StringBuilder> tableToStatementBuilder = new HashMap<>();
+	Map<String, AtomicInteger> tableToStatementCount = new HashMap<>();
 
 	public Sqlite(File dbFile) {
 		this.dbFile = dbFile;
@@ -52,6 +57,37 @@ public class Sqlite {
 		execute(sqlBuilder.toString());
 	}
 
+	private void initializeTableMaps(String table) {
+		if(!tableToStatementBuilder.containsKey(table)) {
+			tableToStatementBuilder.put(table, new StringBuilder());
+			tableToStatementCount.put(table, new AtomicInteger(-1));
+		}
+	}
+	public String startInsertStatement(String tableName, VaultModel data) {
+		initializeTableMaps(tableName);
+		StringBuilder sqlBuilder = new StringBuilder("INSERT INTO " + tableName + " (");
+		sqlBuilder.append(String.join(",", data.getFieldNames()));
+		sqlBuilder.append(")\nVALUES ");
+		addBuildingStatement(tableName, sqlBuilder.toString());
+		tableToStatementCount.get(tableName).set(0);
+		return sqlBuilder.toString();
+	}
+	public String addInsertValues(String table, VaultModel data) {
+		StringBuilder sqlBuilder = new StringBuilder("(");
+		int fieldCount = 0;
+		for (String fieldName : data.getFieldNames()) {
+			fieldCount++;
+			sqlBuilder.append("\"" + data.get(fieldName) + "\"");
+			if (fieldCount < data.getFieldNames().size()) {
+				sqlBuilder.append(",");
+			}
+		}
+		sqlBuilder.append(")\n");
+
+		addBuildingStatement(table, sqlBuilder.toString());
+		return sqlBuilder.toString();
+	}
+
 	public String createInsertStatement(String tableName, VaultModel data) {
 		StringBuilder sqlBuilder = new StringBuilder("INSERT INTO " + tableName + " (");
 		sqlBuilder.append(String.join(",", data.getFieldNames()));
@@ -69,6 +105,15 @@ public class Sqlite {
 		addStatement(sqlBuilder.toString());
 		return sqlBuilder.toString();
 	}
+	public void addBuildingStatement(String table, String sql) {
+		AtomicInteger localNumStatements = tableToStatementCount.get(table);
+		StringBuilder localBuilder = tableToStatementBuilder.get(table);
+		if (localNumStatements.get()>0) {
+			localBuilder.append(",");
+		}
+		localBuilder.append(sql);
+		localNumStatements.incrementAndGet();
+	}
 
 	public void addStatement(String sql) {
 		sqlCachedStatements.append(sql);
@@ -78,6 +123,29 @@ public class Sqlite {
 			execute(sqlCachedStatements.toString());
 			sqlCachedStatements.setLength(0);
 			numStatements = 0;
+		}
+	}
+
+	public void flushBuilders() {
+		try {
+			StringBuilder sb = new StringBuilder();
+			sb.append("BEGIN TRANSACTION;\n");
+			tableToStatementBuilder.values()
+					.stream()
+					.map(builder-> builder.append(";\n").toString())
+					.forEach(statement-> sb.append(statement));
+			sb.append("COMMIT;\n");
+			if (sb != null) {
+				execute(sb.toString());
+				tableToStatementBuilder
+						.values()
+						.forEach(builder-> builder.setLength(0));
+				tableToStatementCount
+						.values()
+						.forEach(counter-> counter.set(0));
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
 		}
 	}
 
@@ -115,8 +183,9 @@ public class Sqlite {
 				stmt.executeUpdate(sql);
 				//stmt.close();
 			} catch (SQLException e) {
+				System.err.println(e.getMessage());
+				e.printStackTrace(System.err);
 				System.out.println(sql);
-				System.out.println(e.getMessage());
 			}
 		}
 	}

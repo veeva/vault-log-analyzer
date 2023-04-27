@@ -6,7 +6,7 @@ import java.io.File;
 
 public class SDKRunner {
 	public static void main(String[] args) {
-		String rootFolderPath = "/example/";
+		String rootFolderPath = "";
 
 		String logFolderPath = rootFolderPath + "logs/";
 		File logDir = new File(logFolderPath);

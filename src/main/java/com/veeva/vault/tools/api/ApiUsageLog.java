@@ -8,7 +8,6 @@ import com.veeva.vault.vapil.api.client.VaultClient;
 import com.veeva.vault.vapil.api.model.VaultModel;
 import com.veeva.vault.vapil.api.model.response.VaultResponse;
 import com.veeva.vault.vapil.api.request.LogRequest;
-import edu.emory.mathcs.backport.java.util.Arrays;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -21,10 +20,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ApiUsageLog {
 	private Logger logger = Logger.getLogger(ApiUsageLog.class);
@@ -212,11 +208,13 @@ public class ApiUsageLog {
 	private void loadToSql(Sqlite sqlDb, String tableName, List<VaultModel> apiLogEntries) {
 		try {
 			if (apiLogEntries != null && apiLogEntries.size() > 0) {
+				sqlDb.startInsertStatement(tableName, apiLogEntries.get(0));
+				sqlDb.startInsertStatement("api", apiLogEntries.get(0));
 				for (VaultModel apiLogEntry : apiLogEntries) {
-					sqlDb.createInsertStatement(tableName, apiLogEntry);
-					sqlDb.createInsertStatement("api", apiLogEntry);
+					sqlDb.addInsertValues(tableName, apiLogEntry);
+					sqlDb.addInsertValues("api", apiLogEntry);
 				}
-				sqlDb.flush();
+				sqlDb.flushBuilders();
 			}
 		}
 		catch (Exception e) {

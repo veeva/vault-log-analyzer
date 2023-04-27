@@ -1,6 +1,7 @@
 package com.veeva.vault.tools.sdk;
 
 import com.veeva.vault.tools.csv.CsvMetadataWriter;
+import com.veeva.vault.tools.util.DateUtils;
 import com.veeva.vault.tools.util.FileUtils;
 import org.apache.log4j.Logger;
 
@@ -98,15 +99,22 @@ public class SdkDebugLog {
 			List<SdkDebugLogEntry> sdkDebugLogEntries = new ArrayList<>();
 			BufferedReader reader = new BufferedReader(new FileReader(logFile));
 			String lineBuffer = reader.readLine();
+			SdkDebugLogEntry lastSdkDebugLogEntry = null;
 			if (lineBuffer != null) {
 				while (lineBuffer != null) {
-					SdkDebugLogEntry sdkDebugLogEntry = transformLine(lineBuffer, reader);
-					sdkDebugLogEntry.setLogFile(logFile.getName());
-					sdkDebugLogEntries.add(sdkDebugLogEntry);
 
-					if (sdkDebugLogEntries.size() == BATCH_SIZE) {
-						csvMetadataWriter.writeAllRows(!outputFile.exists(), outputFile.exists(), outputFile, sdkDebugLogEntries);
-						sdkDebugLogEntries.clear();
+					if (lineBuffer.length() > 23 && DateUtils.isDateTime(lineBuffer.substring(0, 23))) {
+						if (sdkDebugLogEntries.size() == BATCH_SIZE) {
+							csvMetadataWriter.writeAllRows(!outputFile.exists(), outputFile.exists(), outputFile, sdkDebugLogEntries);
+							sdkDebugLogEntries.clear();
+						}
+						SdkDebugLogEntry sdkDebugLogEntry = transformLine(lineBuffer, reader);
+						sdkDebugLogEntry.setLogFile(logFile.getName());
+						sdkDebugLogEntries.add(sdkDebugLogEntry);
+						lastSdkDebugLogEntry = sdkDebugLogEntry;
+					}
+					else if (lastSdkDebugLogEntry != null) {
+						lastSdkDebugLogEntry.setMessage(lastSdkDebugLogEntry.getMessage() + " " + lineBuffer);
 					}
 
 					lineBuffer = reader.readLine();
@@ -118,6 +126,7 @@ public class SdkDebugLog {
 			}
 		}
 		catch (Exception e) {
+			e.printStackTrace();
 			logger.error(e.getMessage());
 		}
 	}
