@@ -2,6 +2,7 @@ DROP TABLE IF EXISTS stats;
 CREATE TABLE stats AS
 SELECT
     substr( timestamp, 1, 10 ) as api_date,
+    vault_id,
     username,
     user_id,
     connection,
@@ -32,6 +33,7 @@ SELECT
 FROM api
 GROUP BY
     api_date,
+    vault_id,
     username,
     user_id,
     connection,

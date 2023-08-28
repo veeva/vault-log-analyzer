@@ -21,3 +21,11 @@ vault.properties
 
 # Log file
 *.log
+/src/test/resources/input_files/*.txt
+/src/test/resources/output_files/*.*
+
+#Docker
+/Docker
+
+#Gitlab
+.gitlab-ci.yml

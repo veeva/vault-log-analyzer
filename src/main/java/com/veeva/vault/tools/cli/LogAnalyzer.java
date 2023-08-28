@@ -12,7 +12,6 @@ public class LogAnalyzer {
 	private static Logger logger = Logger.getLogger(LogAnalyzer.class);
 
 	public static void main(String[] args) {
-
 		AnalyzerOptions analyzerOptions = AnalyzerOptions.loadFromCliArguments(args);
 
 		if (analyzerOptions.getLogType() == null) {
@@ -53,7 +52,7 @@ public class LogAnalyzer {
 							}
 							else {
 								ApiUsageLog apiUsageLogImporter = new ApiUsageLog(outputDatabaseFile);
-								apiUsageLogImporter.importLogFiles(inputApiLogDirectory);
+								apiUsageLogImporter.importLogFiles(inputApiLogDirectory, analyzerOptions);
 							}
 
 							break;

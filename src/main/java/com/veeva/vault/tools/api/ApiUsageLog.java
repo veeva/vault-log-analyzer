@@ -1,5 +1,6 @@
 package com.veeva.vault.tools.api;
 
+import com.veeva.vault.tools.cli.AnalyzerOptions;
 import com.veeva.vault.tools.csv.CsvMetadataReader;
 import com.veeva.vault.tools.csv.CsvMetadataWriter;
 import com.veeva.vault.tools.sql.Sqlite;
@@ -21,6 +22,8 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ApiUsageLog {
 	private Logger logger = Logger.getLogger(ApiUsageLog.class);
@@ -53,7 +56,6 @@ public class ApiUsageLog {
 						.toString();
 				outputFile = new File(defaultOutputFilePath);
 			}
-
 			String sql = new String(FileUtils.getResourceContent("api/stats.sql"));
 			sqlDb.execute(sql);
 
@@ -151,18 +153,32 @@ public class ApiUsageLog {
 		}
 	}
 
-	public void importLogFiles(File logDirectory) {
+	public void importLogFiles(File logDirectory, AnalyzerOptions analyzerOptions) {
 		try {
 			List<File> logFiles = FileUtils.getFiles(logDirectory, ".csv");
 
 			int fileCount = 0;
 			for (File apiLogFile : logFiles) {
+				String vaultId = analyzerOptions.getVaultId();
+				if (vaultId == null || vaultId.isEmpty()) {
+					String fileName = apiLogFile.getName();
+					String numberPattern = "^\\d+";
+
+					Pattern pattern = Pattern.compile(numberPattern);
+					Matcher matcher = pattern.matcher(fileName);
+
+					if (matcher.find()) {
+						vaultId = matcher.group();
+					} else {
+						vaultId = "unknown";
+					}
+				}
+//
 				fileCount++;
 
 				long numLines = Files.lines(apiLogFile.toPath()).count();
 				if (numLines > 1) {
 					long totalBatches = (numLines + BATCH_SIZE - 1) / BATCH_SIZE;
-
 					CsvMetadataReader apiLogReader = new CsvMetadataReader(apiLogFile, VaultModel.class);
 					String sqlTableName = "vaultApi" + apiLogFile.getName().replace("-", "").replace(".csv", "");
 
@@ -187,7 +203,7 @@ public class ApiUsageLog {
 
 						List<VaultModel> apiLogEntries = apiLogReader.getRows(BATCH_SIZE);
 						if (apiLogEntries != null && apiLogEntries.size() > 0) {
-							transform(apiLogEntries);
+							transform(apiLogEntries, vaultId);
 							if (!createdTable) {
 								sqlDb.createTable(sqlTableName, apiLogEntries.get(0).getFieldNames(), true);
 								sqlDb.createTable("api", apiLogEntries.get(0).getFieldNames(), false);
@@ -221,18 +237,18 @@ public class ApiUsageLog {
 			logger.error(e.getMessage());
 		}
 	}
-
-	private void transform(List<VaultModel> apiLogEntries) {
+	private void transform(List<VaultModel> apiLogEntries, String vaultId) {
 		try {
 			for (VaultModel apiLogEntry : apiLogEntries) {
 
-				//preparing 23R1 features
 				if (!apiLogEntry.getFieldNames().contains("connection")) {
 					apiLogEntry.set("connection", "23R1-Feature");
 				}
 				if (!apiLogEntry.getFieldNames().contains("api_resource")) {
 					apiLogEntry.set("api_resource", "23R1-Feature");
 				}
+
+				apiLogEntry.set("vault_id", vaultId);
 
 				String apiEndpoint = apiLogEntry.getString("endpoint");
 				if (apiEndpoint != null) {

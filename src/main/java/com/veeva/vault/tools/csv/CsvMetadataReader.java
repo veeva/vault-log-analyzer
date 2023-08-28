@@ -40,6 +40,8 @@ public class CsvMetadataReader<T> {
 
 		headerRow = headerIterator.next();
 
+		headerRow.put("vault_id", "");
+
 		this.rowClass = rowClass;
 		rowIterator = mapper.readerFor(rowClass)
 				.with(getSchema())

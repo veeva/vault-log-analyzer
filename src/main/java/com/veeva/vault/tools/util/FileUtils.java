@@ -159,4 +159,10 @@ public class FileUtils {
 		effectivePath = base.resolve(path).toAbsolutePath();
 		return effectivePath.normalize().toString();
 	}
+
+	public static boolean checkApiLogFileNameFormat(String fileName) {
+		String format = "^[0-9]+-[a-zA-Z]+-\\d{4}-\\d{2}-\\d{2}$";
+
+		return false;
+	}
 }

@@ -42,6 +42,15 @@ public class AnalyzerOptions extends VaultModel {
 	public void setAction(String action) { this.set("action", action); }
 
 	//------------------------------------------------------------------------------------------------
+	// Vault ID
+	//------------------------------------------------------------------------------------------------
+
+	@JsonProperty("vaultId")
+	@JsonAlias("vaultid")
+	public String getVaultId() {return this.getString("vaultId");}
+	public void setVaultId(String vaultId) { this.set("vaultId", vaultId); }
+
+	//------------------------------------------------------------------------------------------------
 	// Vault API Details
 	//------------------------------------------------------------------------------------------------
 	@JsonProperty("vaultDNS")
