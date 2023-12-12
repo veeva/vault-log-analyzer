@@ -1,0 +1,10 @@
+-logtype
+API
+-action
+IMPORT
+-vaultId
+12345
+-input
+G:\My Drive\Veeva\Software Development\Vault\Open Source Tools\Vault Log Analyzer\23.3.0\Testing\data\api\logs_test
+-output
+src\test\resources\output_files\api_import.db

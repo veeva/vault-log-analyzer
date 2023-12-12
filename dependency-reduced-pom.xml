@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.veeva.vault.</groupId>
   <artifactId>vault-log-analyzer</artifactId>
-  <version>23.2.0</version>
+  <version>23.3.0</version>
   <build>
     <finalName>${project.artifactId}-${project.version}</finalName>
     <plugins>
@@ -122,9 +122,9 @@
     </dependency>
   </dependencies>
   <properties>
-    <java.version>8</java.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>8</maven.compiler.source>
     <maven.compiler.target>8</maven.compiler.target>
+    <java.version>8</java.version>
+    <maven.compiler.source>8</maven.compiler.source>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 </project>

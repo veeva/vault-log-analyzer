@@ -1,0 +1,8 @@
+-logtype
+API
+-action
+ANALYZE
+-input
+src\test\resources\output_files\api_import.db
+-output
+src\test\resources\output_files\api_logs.csv
