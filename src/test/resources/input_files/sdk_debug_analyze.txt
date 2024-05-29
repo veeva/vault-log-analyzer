@@ -3,6 +3,6 @@ DEBUG
 -action
 ANALYZE
 -input
-G:\My Drive\Veeva\Software Development\Vault\Open Source Tools\Vault Log Analyzer\23.3.0\Testing\data\sdk_debug\logs_test
+G:\My Drive\Veeva\Software Development\Vault\Open Source Tools\Vault Log Analyzer\24.1.0\Testing\data\sdk_debug\logs_test
 -output
 src\test\resources\output_files\sdk_debug_logs.csv

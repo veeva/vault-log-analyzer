@@ -1,7 +1,8 @@
 package com.veeva.vault.tools.util;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import shaded.org.slf4j.Logger;
+import shaded.org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.URL;
@@ -17,7 +18,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class FileUtils {
-	private static Logger logger = Logger.getLogger(FileUtils.class);
+	private static Logger logger = LoggerFactory.getLogger(FileUtils.class);
 
 	public static boolean endsWith(File file, String fileExtension) {
 		if (file != null && fileExtension != null) {

@@ -6,7 +6,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.veeva.vault.vapil.api.model.VaultModel;
-import org.apache.log4j.Logger;
+import shaded.org.slf4j.Logger;
+import shaded.org.slf4j.LoggerFactory;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -16,7 +17,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class AnalyzerOptions extends VaultModel {
-	private static Logger logger = Logger.getLogger(AnalyzerOptions.class);
+	private static Logger logger = LoggerFactory.getLogger(AnalyzerOptions.class);
 
 	//------------------------------------------------------------------------------------------------
 	// Log Type: Expected Values [API,DEBUG,RUNTIME]

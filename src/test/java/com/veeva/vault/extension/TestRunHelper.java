@@ -1,6 +1,7 @@
 package com.veeva.vault.extension;
 
-import org.apache.log4j.Logger;
+import shaded.org.slf4j.Logger;
+import shaded.org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,7 +11,7 @@ import java.util.List;
 
 public class TestRunHelper {
 
-    private static final Logger LOGGER = Logger.getLogger(TestRunHelper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestRunHelper.class);
 
     public static String[] getTestArgs(String filePath) throws IOException {
         File testFile = new File(filePath);

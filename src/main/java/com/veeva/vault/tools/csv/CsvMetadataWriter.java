@@ -13,7 +13,8 @@ import com.fasterxml.jackson.dataformat.csv.CsvGenerator;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.veeva.vault.tools.util.FileUtils;
-import org.apache.log4j.Logger;
+import shaded.org.slf4j.Logger;
+import shaded.org.slf4j.LoggerFactory;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -22,7 +23,7 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 
 public class CsvMetadataWriter<T> {
-	private static Logger logger = Logger.getLogger(CsvMetadataWriter.class);
+	private static Logger logger = LoggerFactory.getLogger(CsvMetadataWriter.class);
 
 	private CsvSchema.Builder outputSchemaBuilder;
 

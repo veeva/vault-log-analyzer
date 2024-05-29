@@ -3,7 +3,8 @@ package com.veeva.vault.tools.sdk;
 import com.veeva.vault.tools.csv.CsvMetadataWriter;
 import com.veeva.vault.tools.util.DateUtils;
 import com.veeva.vault.tools.util.FileUtils;
-import org.apache.log4j.Logger;
+import shaded.org.slf4j.Logger;
+import shaded.org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.file.FileSystems;
@@ -12,8 +13,9 @@ import java.time.ZonedDateTime;
 import java.util.*;
 
 public class SdkDebugLog {
-	private Logger logger = Logger.getLogger(SdkDebugLog.class);
-
+	private Logger logger = LoggerFactory.getLogger(SdkDebugLog.class);
+	private List<SdkDebugLogEntry> sysdataEntries = new ArrayList<>();
+	private int numEntryPoints = 0;
 	private final int BATCH_SIZE = 500;
 
 	/**
@@ -61,6 +63,8 @@ public class SdkDebugLog {
 				for (File logFile : files) {
 					numFiles++;
 					analyzeLogFile(logFile, outputFile);
+					numEntryPoints = 0;
+					sysdataEntries.clear();
 				}
 			}
 			else {
@@ -78,6 +82,10 @@ public class SdkDebugLog {
 
 			CsvMetadataWriter csvMetadataWriter = new CsvMetadataWriter();
 			csvMetadataWriter.addColumn("timestamp");
+			csvMetadataWriter.addColumn("execution_id");
+			csvMetadataWriter.addColumn("vault_id");
+			csvMetadataWriter.addColumn("user_id");
+			csvMetadataWriter.addColumn("transaction_id");
 			csvMetadataWriter.addColumn("log_file");
 			csvMetadataWriter.addColumn("type");
 			csvMetadataWriter.addColumn("category");
@@ -85,9 +93,9 @@ public class SdkDebugLog {
 			csvMetadataWriter.addColumn("service_method");
 			csvMetadataWriter.addColumn("service_name");
 			csvMetadataWriter.addColumn("method_name");
-			csvMetadataWriter.addColumn("elapsed_time");
+			csvMetadataWriter.addColumn("elapsed_time_ms");
 			csvMetadataWriter.addColumn("elapsed_time_seconds");
-			csvMetadataWriter.addColumn("cpu_time");
+			csvMetadataWriter.addColumn("cpu_time_ns");
 			csvMetadataWriter.addColumn("cpu_time_seconds");
 			csvMetadataWriter.addColumn("memory");
 			csvMetadataWriter.addColumn("memory_mb");
@@ -146,15 +154,34 @@ public class SdkDebugLog {
 			tempBuffer = tempBuffer.substring(tempBuffer.indexOf(" ") + 1).trim();
 
 			switch (sdkDebugLogEntry.getType()) {
+				case "SYSDATA":
+					sdkDebugLogEntry.setCategory("REQUEST");
+					tempBuffer = tempBuffer.substring(tempBuffer.indexOf("{\"executionId\":\"") + 16);
+					sdkDebugLogEntry.setExecutionId(tempBuffer.substring(0, tempBuffer.indexOf("\"")));
+
+					tempBuffer = tempBuffer.substring(tempBuffer.indexOf("\",\"vaultId\":") + 12);
+					sdkDebugLogEntry.setVaultId(tempBuffer.substring(0, tempBuffer.indexOf(",")));
+
+					tempBuffer = tempBuffer.substring(tempBuffer.indexOf(",\"userId\":") + 10);
+					sdkDebugLogEntry.setUserId(tempBuffer.substring(0, tempBuffer.indexOf(",")));
+
+					tempBuffer = tempBuffer.substring(tempBuffer.indexOf(",\"transactionId\":\"") + 18);
+					sdkDebugLogEntry.setTransactionId(tempBuffer.substring(0, tempBuffer.indexOf("\"")));
+
+					sysdataEntries.add(sdkDebugLogEntry);
+					numEntryPoints++;
+					break;
 				case "SYSERR":
 					sdkDebugLogEntry.setCategory("EXCEPTION");
 					StringBuilder exceptionBuilder = new StringBuilder();
 					String errorBuffer = tempBuffer;
 					while (errorBuffer != null) {
-						exceptionBuilder.append(errorBuffer + "\n");
+//						exceptionBuilder.append(errorBuffer + "\n");
+						exceptionBuilder.append(errorBuffer + " ");
 						errorBuffer = reader.readLine();
 					}
 					sdkDebugLogEntry.setMessage(exceptionBuilder.toString());
+					setRequestAttributes(sdkDebugLogEntry);
 					break;
 				case "SYSWRN":
 					sdkDebugLogEntry.setCategory("ALERT");
@@ -165,6 +192,7 @@ public class SdkDebugLog {
 						warningBuffer = reader.readLine();
 					}
 					sdkDebugLogEntry.setMessage(warningBuilder.toString());
+					setRequestAttributes(sdkDebugLogEntry);
 					break;
 				case "SYSINFO":
 					if (tempBuffer.startsWith("*****Start Execution")) {
@@ -201,15 +229,24 @@ public class SdkDebugLog {
 							sdkDebugLogEntry.setMessage(tempBuffer);
 						}
 					}
-
+					setRequestAttributes(sdkDebugLogEntry);
 					break;
 				case "PERF":
 					if (lineBuffer.contains("\"")) {
 						sdkDebugLogEntry.setCategory("LOGSERVICE");
 						sdkDebugLogEntry.setMessage(tempBuffer.substring(1, tempBuffer.indexOf("\":")));
 						tempBuffer = tempBuffer.substring(tempBuffer.indexOf("\":") + 2);
+						setRequestAttributes(sdkDebugLogEntry);
 					} else {
 						sdkDebugLogEntry.setCategory("SYSPERF");
+						SdkDebugLogEntry matchingEntry = sysdataEntries.stream()
+								.filter(entry -> sdkDebugLogEntry.getClassName().equals(entry.getClassName()))
+								.findFirst()
+								.get();
+						sdkDebugLogEntry.setExecutionId(matchingEntry.getExecutionId());
+						sdkDebugLogEntry.setVaultId(matchingEntry.getVaultId());
+						sdkDebugLogEntry.setUserId(matchingEntry.getUserId());
+						sdkDebugLogEntry.setTransactionId(matchingEntry.getTransactionId());
 					}
 
 					List<String> metrics = Arrays.asList(tempBuffer.split(" "));
@@ -227,11 +264,15 @@ public class SdkDebugLog {
 
 					break;
 				case "DEBUG":
+					setRequestAttributes(sdkDebugLogEntry);
 				case "ERROR":
+					setRequestAttributes(sdkDebugLogEntry);
 				case "INFO":
+					setRequestAttributes(sdkDebugLogEntry);
 				case "WARN":
 					sdkDebugLogEntry.setCategory("LOGSERVICE");
 					sdkDebugLogEntry.setMessage(tempBuffer);
+					setRequestAttributes(sdkDebugLogEntry);
 					break;
 			}
 
@@ -242,5 +283,14 @@ public class SdkDebugLog {
 			e.printStackTrace();
 			return null;
 		}
+	}
+
+	private SdkDebugLogEntry setRequestAttributes(SdkDebugLogEntry sdkDebugLogEntry) {
+		SdkDebugLogEntry sysDataEntry = sysdataEntries.get(numEntryPoints - 1);
+		sdkDebugLogEntry.setExecutionId(sysDataEntry.getExecutionId());
+		sdkDebugLogEntry.setVaultId(sysDataEntry.getVaultId());
+		sdkDebugLogEntry.setUserId(sysDataEntry.getUserId());
+		sdkDebugLogEntry.setTransactionId(sysDataEntry.getTransactionId());
+		return sdkDebugLogEntry;
 	}
 }

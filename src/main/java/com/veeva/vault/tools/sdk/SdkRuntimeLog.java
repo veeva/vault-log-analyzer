@@ -4,7 +4,8 @@ import com.veeva.vault.tools.util.FileUtils;
 import com.veeva.vault.vapil.api.client.VaultClient;
 import com.veeva.vault.vapil.api.model.response.VaultResponse;
 import com.veeva.vault.vapil.api.request.LogRequest;
-import org.apache.log4j.Logger;
+import shaded.org.slf4j.Logger;
+import shaded.org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.time.LocalDate;
@@ -12,7 +13,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 public class SdkRuntimeLog {
-	private Logger logger = Logger.getLogger(SdkRuntimeLog.class);
+	private Logger logger = LoggerFactory.getLogger(SdkRuntimeLog.class);
 
 	public void download(VaultClient vaultClient, LocalDate startDate, LocalDate endDate, File outputDirectory, Boolean unZipAfterDownload) {
 		try {

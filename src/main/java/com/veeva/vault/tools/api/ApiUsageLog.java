@@ -9,7 +9,8 @@ import com.veeva.vault.vapil.api.client.VaultClient;
 import com.veeva.vault.vapil.api.model.VaultModel;
 import com.veeva.vault.vapil.api.model.response.VaultResponse;
 import com.veeva.vault.vapil.api.request.LogRequest;
-import org.apache.log4j.Logger;
+import shaded.org.slf4j.Logger;
+import shaded.org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.nio.file.FileSystems;
@@ -26,7 +27,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ApiUsageLog {
-	private Logger logger = Logger.getLogger(ApiUsageLog.class);
+	private Logger logger = LoggerFactory.getLogger(ApiUsageLog.class);
 
 	private final int BATCH_SIZE = 500;
 

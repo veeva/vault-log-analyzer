@@ -9,6 +9,22 @@ public class SdkDebugLogEntry extends VaultModel {
 	String getTimestanp() { return this.getString("timestamp"); }
 	void setTimestamp(String timestamp) { this.set("timestamp", timestamp); }
 
+	@JsonProperty("execution_id")
+	String getExecutionId() { return this.getString("execution_id"); }
+	void setExecutionId(String executionId) { this.set("execution_id", executionId); }
+
+	@JsonProperty("vault_id")
+	String getVaultId() { return this.getString("vault_id"); }
+	void setVaultId(String vaultId) { this.set("vault_id", vaultId); }
+
+	@JsonProperty("user_id")
+	String getUserId() { return this.getString("user_id"); }
+	void setUserId(String userId) { this.set("user_id", userId); }
+
+	@JsonProperty("transaction_id")
+	String getTransactionId() { return this.getString("transaction_id"); }
+	void setTransactionId(String transactionId) { this.set("transaction_id", transactionId); }
+
 	@JsonProperty("log_file")
 	String getLogFile() { return this.getString("log_file"); }
 	void setLogFile(String logFile) { this.set("log_file", logFile); }
@@ -49,10 +65,10 @@ public class SdkDebugLogEntry extends VaultModel {
 		return null;
 	}
 
-	@JsonProperty("elapsed_time")
-	Long getElapsedTime() { return this.getLong("elapsed_time", Long.valueOf(0)); }
+	@JsonProperty("elapsed_time_ms")
+	Long getElapsedTime() { return this.getLong("elapsed_time_ms", Long.valueOf(0)); }
 	void setElapsedTime(Long elapsedTime) {
-		this.set("elapsed_time", elapsedTime);
+		this.set("elapsed_time_ms", elapsedTime);
 	}
 
 	@JsonProperty("elapsed_time_seconds")
@@ -60,9 +76,9 @@ public class SdkDebugLogEntry extends VaultModel {
 		return getLongAsDouble(getElapsedTime(), 1000);
 	}
 
-	@JsonProperty("cpu_time")
-	Long getCpuTime() { return this.getLong("cpu_time", Long.valueOf(0)); }
-	void setCpuTime(Long cpuTime) { this.set("cpu_time", cpuTime); }
+	@JsonProperty("cpu_time_ns")
+	Long getCpuTime() { return this.getLong("cpu_time_ns", Long.valueOf(0)); }
+	void setCpuTime(Long cpuTime) { this.set("cpu_time_ns", cpuTime); }
 
 	@JsonProperty("cpu_time_seconds")
 	Double getCpuTimeSeconds() {

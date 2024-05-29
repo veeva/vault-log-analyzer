@@ -4,12 +4,13 @@ import com.veeva.vault.tools.api.ApiUsageLog;
 import com.veeva.vault.tools.sdk.SdkDebugLog;
 import com.veeva.vault.tools.sdk.SdkRuntimeLog;
 import com.veeva.vault.vapil.api.client.VaultClient;
-import org.apache.log4j.Logger;
+import shaded.org.slf4j.Logger;
+import shaded.org.slf4j.LoggerFactory;
 
 import java.io.File;
 
 public class LogAnalyzer {
-	private static Logger logger = Logger.getLogger(LogAnalyzer.class);
+	private static Logger logger = LoggerFactory.getLogger(LogAnalyzer.class);
 
 	public static void main(String[] args) {
 		AnalyzerOptions analyzerOptions = AnalyzerOptions.loadFromCliArguments(args);

@@ -11,13 +11,14 @@ import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvParser;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
-import org.apache.log4j.Logger;
+import shaded.org.slf4j.Logger;
+import shaded.org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.*;
 
 public class CsvMetadataReader<T> {
-	private static Logger logger = Logger.getLogger(CsvMetadataReader.class);
+	private static Logger logger = LoggerFactory.getLogger(CsvMetadataReader.class);
 
 	Set<String> fieldNames = null;
 	Map<String, String> headerRow;
