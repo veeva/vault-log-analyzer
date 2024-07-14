@@ -11,11 +11,13 @@ import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvParser;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import com.veeva.vault.vapil.api.model.VaultModel;
 import shaded.org.slf4j.Logger;
 import shaded.org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.*;
+import java.util.regex.Pattern;
 
 public class CsvMetadataReader<T> {
 	private static Logger logger = LoggerFactory.getLogger(CsvMetadataReader.class);
@@ -49,18 +51,36 @@ public class CsvMetadataReader<T> {
 				.readValues(inputFile);
 	}
 
-	public <T> List<T> getAllRows() {
+	public List<VaultModel> getAllRows() {
 		return getRows(null);
 	}
 
-	public <T> List<T> getRows(Integer batchLimit) {
+	public List<VaultModel> getRows(Integer batchLimit) {
 		try {
-			List<T> result = new ArrayList<>();
+			List<VaultModel> result = new ArrayList<>();
+			boolean previousRowInvalid = false;
 			while (rowIterator.hasNext()
 					&& ((batchLimit == null)
 						|| (batchLimit == 0)
 						|| (result.size() < batchLimit))) {
-				result.add((T)rowIterator.next());
+
+				VaultModel row = (VaultModel)rowIterator.next();
+//				Temp fix for DEV-691878. Api Error Messages printing on multiple lines
+				if (!checkValidRow(row)) {
+					if (!previousRowInvalid) {
+						result.get(result.size() - 1).set("reference_id", "");
+					}
+					previousRowInvalid = true;
+					continue;
+				}
+
+				String errorMessage = (String) row.get("api_response_error_message");
+				if (errorMessage != null && errorMessage.length() > 0) {
+					errorMessage = errorMessage.replace("\"", "");
+					row.set("api_response_error_message", errorMessage);
+				}
+				previousRowInvalid = false;
+				result.add(row);
 			}
 
 			return result;
@@ -97,5 +117,12 @@ public class CsvMetadataReader<T> {
 
 	public Set<String> getFieldNames() {
 		return fieldNames;
+	}
+
+	private boolean checkValidRow(VaultModel row) {
+//		Regex to check that row starts with timestamp in "YYY-MM-DDT" format
+		String pattern = "^\\d{4}-\\d{2}-\\d{2}T";
+		Pattern regex = Pattern.compile(pattern);
+		return regex.matcher((String) row.get("timestamp")).find();
 	}
 }
