@@ -5,6 +5,6 @@ IMPORT
 -vaultId
 12345
 -input
-G:\My Drive\Veeva\Software Development\Vault\Open Source Tools\Vault Log Analyzer\24.1.0\Testing\data\api\logs_test
+G:\My Drive\Veeva\Software Development\Vault\Open Source\Vault Log Analyzer\24.2.0\Testing\data\api\logs_name_space
 -output
 src\test\resources\output_files\api_import.db

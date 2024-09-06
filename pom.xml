@@ -6,7 +6,7 @@
 
     <groupId>com.veeva.vault.</groupId>
     <artifactId>vault-log-analyzer</artifactId>
-    <version>24.1.1</version>
+    <version>24.2.0</version>
 
     <packaging>jar</packaging>
 
@@ -43,7 +43,7 @@
         <dependency>
             <groupId>com.veeva.vault</groupId>
             <artifactId>vapil</artifactId>
-            <version>24.1.1</version>
+            <version>24.2.0</version>
         </dependency>
         <dependency>
             <groupId>org.json</groupId>

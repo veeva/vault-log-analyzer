@@ -4,8 +4,8 @@ import com.veeva.vault.tools.util.FileUtils;
 import com.veeva.vault.vapil.api.client.VaultClient;
 import com.veeva.vault.vapil.api.model.response.VaultResponse;
 import com.veeva.vault.vapil.api.request.LogRequest;
-import shaded.org.slf4j.Logger;
-import shaded.org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.time.LocalDate;

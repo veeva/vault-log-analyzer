@@ -9,8 +9,8 @@ import com.veeva.vault.vapil.api.client.VaultClient;
 import com.veeva.vault.vapil.api.model.VaultModel;
 import com.veeva.vault.vapil.api.model.response.VaultResponse;
 import com.veeva.vault.vapil.api.request.LogRequest;
-import shaded.org.slf4j.Logger;
-import shaded.org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.nio.file.FileSystems;
@@ -181,7 +181,9 @@ public class ApiUsageLog {
 				if (numLines > 1) {
 					long totalBatches = (numLines + BATCH_SIZE - 1) / BATCH_SIZE;
 					CsvMetadataReader apiLogReader = new CsvMetadataReader(apiLogFile, VaultModel.class);
-					String sqlTableName = "vaultApi" + apiLogFile.getName().replace("-", "").replace(".csv", "");
+					String sqlTableName = "vaultApi" + apiLogFile.getName()
+							.replace(".csv", "")
+							.replaceAll("[^a-zA-Z0-9]", "");
 
 					boolean createdTable = false;
 					int batchCount = 0;

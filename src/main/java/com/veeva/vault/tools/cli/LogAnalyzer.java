@@ -4,8 +4,8 @@ import com.veeva.vault.tools.api.ApiUsageLog;
 import com.veeva.vault.tools.sdk.SdkDebugLog;
 import com.veeva.vault.tools.sdk.SdkRuntimeLog;
 import com.veeva.vault.vapil.api.client.VaultClient;
-import shaded.org.slf4j.Logger;
-import shaded.org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 

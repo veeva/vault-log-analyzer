@@ -3,8 +3,8 @@ package com.veeva.vault.tools.sdk;
 import com.veeva.vault.tools.csv.CsvMetadataWriter;
 import com.veeva.vault.tools.util.DateUtils;
 import com.veeva.vault.tools.util.FileUtils;
-import shaded.org.slf4j.Logger;
-import shaded.org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.file.FileSystems;
